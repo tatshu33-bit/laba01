@@ -91,8 +91,6 @@ ORDER BY unit_price DESC
 LIMIT 10;
 ```
 
-`[Скріншот]`
-
 **4.2. 5 останніх замовлень**
 ```sql
 SELECT order_id, order_date
@@ -100,9 +98,6 @@ FROM orders
 ORDER BY order_date DESC
 LIMIT 5;
 ```
-
-`[Скріншот]`
-
 **4.3. Перші 8 клієнтів в алфавітному порядку**
 ```sql
 SELECT contact_name
@@ -111,9 +106,8 @@ ORDER BY contact_name
 LIMIT 8;
 ```
 
-`[Скріншот]`
+<img width="1502" height="820" alt="image" src="https://github.com/user-attachments/assets/489e0ddf-e19f-4adb-b0e6-4dcb575d526e" />
 
----
 
 ## Рівень 2
 
@@ -125,15 +119,12 @@ SELECT * FROM customers
 WHERE contact_name LIKE 'Іван%';
 ```
 
-`[Скріншот]`
-
 **5.2. Товари зі словом "phone" або "телефон" у назві**
 ```sql
 SELECT * FROM products
 WHERE product_name LIKE '%phone%' OR product_name LIKE '%телефон%';
 ```
 
-`[Скріншот]`
 
 **Самостійно — 3 власні запити з LIKE:**
 
@@ -161,7 +152,8 @@ FROM customers
 WHERE contact_name LIKE '%енко';
 ```
 
-`[Скріншот]` (для кожного із трьох запитів)
+<img width="1502" height="639" alt="image" src="https://github.com/user-attachments/assets/62d732b8-d2ce-43fa-817e-077ddb2da7e8" />
+
 
 ### 6. Логічні оператори AND, OR, NOT
 
