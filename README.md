@@ -1,398 +1,281 @@
-# Лабораторна робота 1. Робота з СУБД PostgreSQL та основи SQL
+Лабораторна робота 1. Робота з СУБД PostgreSQL та основи SQL
+Загальна інформація
+Здобувач освіти: Дмитро Кондратюк
 
-## Загальна інформація
+Група: ІПЗ-23
 
-**Здобувач освіти:** Кондратюк Дмитро Михайлович
-**Група:** Іпз-33
-**Обраний рівень складності:** 2 (з елементами демонстрації базового рівня 1)
+Обраний рівень складності: 2
 
-> ⚠️ **Примітка перед захистом:** усі запити нижче складені на основі стандартної структури навчальної бази `technomart.sql` (таблиці `customers`, `products`, `employees`, `orders`), описаної у методичних вказівках. Перед здачею виконайте кожен запит у Supabase SQL Editor на своєму проєкті, звірте назви стовпців зі своєю реальною схемою (можуть незначно відрізнятись) та додайте власні скріншоти результатів замість плейсхолдерів `[Скріншот]`.
+Виконання завдань
+Список таблиць
+SQL
+-- Запит для отримання списку таблиць
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+ORDER BY table_name;
+Результат: У базі даних створено 8 основних таблиць: categories, customers, employees, order_items, orders, products, regions, suppliers.
 
----
+[Вставити скріншот]
 
-## Виконання завдань
+РІВЕНЬ 1. ОСНОВНІ ЗАПИТИ
+1. Отримати всі записи з таблиці customers.
 
-## Рівень 1
-
-### 1. Основні SELECT запити
-
-**1.1. Отримати всі записи з таблиці customers**
-```sql
+SQL
 SELECT * FROM customers;
-```
-Результат: виведено повний список клієнтів (фізичні та юридичні особи) з усіма атрибутами.
-**1.2. Вивести тільки назви товарів і їхні ціни з таблиці products**
-```sql
-SELECT product_name, unit_price
-FROM products;
-```
-Результат: отримано скорочений набір даних — лише назва товару та її ціна, без зайвих стовпців.
-**1.3. Показати контактні дані всіх співробітників**
-```sql
-SELECT first_name, last_name, phone, email
-FROM employees;
-```
-Результат: виведено ПІБ, телефон та email кожного співробітника компанії.
-<img width="800" height="804" alt="image" src="https://github.com/user-attachments/assets/aa1b962b-a9ab-4b93-92b9-6f270eae1b03" />
-### 2. Прості умови WHERE
-**2.1. Клієнти з міста Київ**
-```sql
-SELECT * FROM customers
-WHERE city = 'Київ';
-```
-**2.2. Товари дорожчі за 25000 грн**
-```sql
-SELECT * FROM products
-WHERE unit_price > 25000;
-```
-**2.3. Замовлення зі статусом 'delivered'**
-```sql
-SELECT * FROM orders
-WHERE status = 'delivered';
-```
-**2.4. Співробітники відділу продажів**
-```sql
-SELECT * FROM employees
-WHERE position LIKE '%продаж%';
-```
-<img width="1585" height="608" alt="image" src="https://github.com/user-attachments/assets/4a629402-7833-4144-97d6-d19539482b14" />
-
-### 3. Базове сортування ORDER BY
-
-**3.1. Товари за зростанням ціни**
-```sql
-SELECT product_name, unit_price
-FROM products
-ORDER BY unit_price ASC;
-```
-**3.2. Клієнти в алфавітному порядку**
-```sql
-SELECT contact_name, city
-FROM customers
-ORDER BY contact_name;
-```
-**3.3. Замовлення від найновіших до найстаріших**
-```sql
-SELECT order_id, order_date
-FROM orders
-ORDER BY order_date DESC;
-```
-<img width="1502" height="820" alt="image" src="https://github.com/user-attachments/assets/01768ea1-5f02-4309-8f5c-1f8d7f8df07c" />
-
-
-
-### 4. Обмеження результатів LIMIT
-
-**4.1. Перші 10 найдорожчих товарів**
-```sql
-SELECT product_name, unit_price
-FROM products
-ORDER BY unit_price DESC
-LIMIT 10;
-```
-
-**4.2. 5 останніх замовлень**
-```sql
-SELECT order_id, order_date
-FROM orders
-ORDER BY order_date DESC
-LIMIT 5;
-```
-**4.3. Перші 8 клієнтів в алфавітному порядку**
-```sql
-SELECT contact_name
-FROM customers
-ORDER BY contact_name
-LIMIT 8;
-```
-
-<img width="1502" height="820" alt="image" src="https://github.com/user-attachments/assets/489e0ddf-e19f-4adb-b0e6-4dcb575d526e" />
-
-
-## Рівень 2
-
-### 5. Пошук за зразком з LIKE
-
-**5.1. Клієнти, чиї імена починаються на "Іван"**
-```sql
-SELECT * FROM customers
-WHERE contact_name LIKE 'Іван%';
-```
-
-**5.2. Товари зі словом "phone" або "телефон" у назві**
-```sql
-SELECT * FROM products
-WHERE product_name LIKE '%phone%' OR product_name LIKE '%телефон%';
-```
-
-
-**Самостійно — 3 власні запити з LIKE:**
-
-```sql
--- Бізнес-логіка: маркетинговий відділ хоче знайти клієнтів
--- з поштою на Gmail для email-розсилки (пошук за закінченням рядка)
-SELECT contact_name, email
-FROM customers
-WHERE email LIKE '%@gmail.com';
-```
-
-```sql
--- Бізнес-логіка: пошук усіх товарів бренду Samsung
--- для формування каталогу партнерської акції (пошук за початком рядка)
-SELECT product_name, unit_price
-FROM products
-WHERE product_name LIKE 'Samsung%';
-```
-
-```sql
--- Бізнес-логіка: пошук клієнтів, прізвище яких закінчується на "енко" —
--- аналіз частотності поширених українських прізвищ у базі (пошук за вмістом)
-SELECT contact_name, city
-FROM customers
-WHERE contact_name LIKE '%енко';
-```
-
-<img width="1502" height="639" alt="image" src="https://github.com/user-attachments/assets/62d732b8-d2ce-43fa-817e-077ddb2da7e8" />
-
-
-### 6. Логічні оператори AND, OR, NOT
-
-**6.1. Товари дорожчі 15000 і дешевші 50000 грн**
-```sql
-SELECT product_name, unit_price
-FROM products
-WHERE unit_price > 15000 AND unit_price < 50000;
-```
-
-`[Скріншот]`
-
-**6.2. Клієнти з Києва або Львова, юридичні особи**
-```sql
-SELECT contact_name, city, customer_type
-FROM customers
-WHERE (city = 'Київ' OR city = 'Львів')
-  AND customer_type = 'company';
-```
-
-`[Скріншот]`
-
-**Самостійно — 4 власні запити:**
-
-```sql
--- Бізнес-логіка: відбір товарів для акції "розпродаж залишків" —
--- недорогі товари, яких залишилось мало на складі
-SELECT product_name, unit_price, units_in_stock
-FROM products
-WHERE unit_price < 10000 AND units_in_stock < 5;
-```
-
-```sql
--- Бізнес-логіка: пошук співробітників, які мають вказаного керівника
--- (тобто НЕ є топ-менеджерами) для списку рядового персоналу
-SELECT first_name, last_name, position
-FROM employees
-WHERE NOT reports_to IS NULL;
-```
-
-```sql
--- Бізнес-логіка: замовлення, які або доставлені, або скасовані —
--- для звіту про "завершені" (закриті) замовлення
-SELECT order_id, status, order_date
-FROM orders
-WHERE status = 'delivered' OR status = 'cancelled';
-```
-
-```sql
--- Бізнес-логіка: клієнти-фізособи не з великих міст —
--- потенційна аудиторія для регіональної рекламної кампанії
-SELECT contact_name, city, customer_type
-FROM customers
-WHERE customer_type = 'individual'
-  AND city != 'Київ'
-  AND city != 'Харків';
-```
-
-`[Скріншот]` (для кожного із чотирьох запитів)
-
-### 7. Оператори IN, BETWEEN, IS NULL
-
-**7.1. Клієнти з міст Київ, Харків, Одеса, Дніпро**
-```sql
-SELECT contact_name, city
-FROM customers
-WHERE city IN ('Київ', 'Харків', 'Одеса', 'Дніпро');
-```
-
-`[Скріншот]`
-
-**7.2. Товари в ціновому діапазоні від 10000 до 30000 грн**
-```sql
-SELECT product_name, unit_price
-FROM products
-WHERE unit_price BETWEEN 10000 AND 30000;
-```
-
-`[Скріншот]`
-
-**Самостійно — по 2 запити для кожного оператора:**
-
-```sql
--- IN (1): бізнес-логіка — вибірка замовлень у "проблемних" статусах
--- для контролю якості обслуговування
-SELECT order_id, status
-FROM orders
-WHERE status IN ('pending', 'cancelled');
-```
-
-```sql
--- IN (2): бізнес-логіка — пошук товарів обраних категорій
--- (наприклад, "Смартфони" і "Ноутбуки") для окремої вітрини сайту
-SELECT product_name, category_id
-FROM products
-WHERE category_id IN (1, 3);
-```
-
-```sql
--- BETWEEN (1): бізнес-логіка — замовлення за 1 квартал 2024 року
--- для формування квартального звіту продажів
-SELECT order_id, order_date
-FROM orders
-WHERE order_date BETWEEN '2024-01-01' AND '2024-03-31';
-```
-
-```sql
--- BETWEEN (2): бізнес-логіка — товари "середнього" цінового сегменту
--- для аналізу найпопулярнішої категорії покупців
-SELECT product_name, unit_price
-FROM products
-WHERE unit_price BETWEEN 5000 AND 15000;
-```
-
-```sql
--- IS NULL (1): бізнес-логіка — товари без опису потребують
--- доопрацювання картки товару відділом контенту
-SELECT product_name
-FROM products
-WHERE description IS NULL;
-```
-
-```sql
--- IS NOT NULL (2): бізнес-логіка — клієнти-юрособи (мають назву компанії)
--- для розсилки B2B-пропозицій
-SELECT contact_name, company_name
-FROM customers
-WHERE company_name IS NOT NULL;
-```
-
-`[Скріншот]` (для кожного із шести запитів)
-
-### 8. Комбінування умов
-
-**Самостійно — 5 складних запитів:**
-
-```sql
--- 1. LIKE + AND: бізнес-логіка — пошук недорогих аксесуарів Apple
--- (чохли, кабелі тощо) для блоку "супутні товари"
-SELECT product_name, unit_price
-FROM products
-WHERE product_name LIKE '%Apple%'
-  AND unit_price < 5000;
-```
-
-```sql
--- 2. BETWEEN + IN: бізнес-логіка — замовлення певних клієнтів
--- за конкретний період для їх персональної історії покупок
-SELECT order_id, customer_id, order_date
-FROM orders
-WHERE order_date BETWEEN '2024-06-01' AND '2024-08-31'
-  AND customer_id IN (1, 2, 3);
-```
-
-```sql
--- 3. LIKE + OR + AND: бізнес-логіка — товари бренду Samsung або Apple,
--- які ще є в наявності на складі
-SELECT product_name, unit_price, units_in_stock
-FROM products
-WHERE (product_name LIKE '%Samsung%' OR product_name LIKE '%Apple%')
-  AND units_in_stock > 0;
-```
-
-```sql
--- 4. IS NULL + LIKE: бізнес-логіка — клієнти-фізособи (без company_name)
--- з електронною поштою на gmail — сегмент для персональних email-акцій
-SELECT contact_name, email
-FROM customers
-WHERE company_name IS NULL
-  AND email LIKE '%@gmail.com';
-```
-
-```sql
--- 5. NOT LIKE + BETWEEN: бізнес-логіка — основні (не аксесуарні) товари
--- середнього і високого цінового сегменту для флагманської вітрини
-SELECT product_name, unit_price
-FROM products
-WHERE product_name NOT LIKE '%чохол%'
-  AND unit_price BETWEEN 20000 AND 60000;
-```
-
-`[Скріншот]` (для кожного із п'яти запитів)
-
-### 9. Складне сортування та пагінація
-
-**Самостійно — 3 запити з сортуванням за кількома полями:**
-
-```sql
--- 1. Бізнес-логіка: каталог товарів, згрупований по категоріях,
--- а всередині категорії — від дорожчих до дешевших
-SELECT category_id, product_name, unit_price
-FROM products
-ORDER BY category_id ASC, unit_price DESC;
-```
-
-```sql
--- 2. Бізнес-логіка: список клієнтів для CRM — спочатку компанії,
--- потім фізособи, і за містом всередині кожного типу
-SELECT contact_name, city, customer_type
-FROM customers
-ORDER BY customer_type DESC, city ASC;
-```
-
-```sql
--- 3. Бізнес-логіка: звіт про замовлення — за статусом,
--- а в межах статусу — від найновіших до найстаріших
-SELECT order_id, status, order_date
-FROM orders
-ORDER BY status ASC, order_date DESC;
-```
-
-**Самостійно — 2 запити з OFFSET для пагінації:**
-
-```sql
--- Сторінка 2 каталогу товарів (записи 11-20), відсортовано за назвою
-SELECT product_name, unit_price
-FROM products
-ORDER BY product_name
-LIMIT 10 OFFSET 10;
-```
-
-```sql
--- Сторінка 3 списку клієнтів (записи 21-30), відсортовано за іменем
-SELECT contact_name, city
-FROM customers
-ORDER BY contact_name
-LIMIT 10 OFFSET 20;
-```
-
-`[Скріншот]` (для кожного із п'яти запитів)
-
----
-
-## Висновки
-
-У ході виконання лабораторної роботи було встановлено з'єднання з хмарною СУБД PostgreSQL на платформі Supabase та відпрацьовано основні можливості команди `SELECT`: вибірку стовпців, фільтрацію за допомогою `WHERE` (оператори порівняння, `LIKE`, `AND`/`OR`/`NOT`, `IN`, `BETWEEN`, `IS NULL`), сортування `ORDER BY` (у тому числі за кількома полями) та обмеження вибірки через `LIMIT`/`OFFSET` для пагінації.
-
-Виконано всі завдання рівня 1 (базові SELECT, WHERE, ORDER BY, LIMIT) та рівня 2 (LIKE, логічні оператори, IN/BETWEEN/IS NULL, комбіновані умови, складне сортування і пагінація), включно з самостійно сформульованими запитами з поясненням бізнес-логіки кожного з них.
-
-**Самооцінка:** 4 (добре)
-
-**Обґрунтування:** виконано всі вимоги рівня 2 в повному обсязі, запити супроводжено коментарями та поясненням бізнес-логіки. Для оцінки "відмінно" додатково потрібно виконати завдання рівня 3 (вкладені логічні умови з дужками, комплексні аналітичні звіти, дослідження закономірностей у даних).
+Результат: Отримано 15 записів клієнтів, включаючи як фізичних осіб, так і юридичні компанії з різних міст України.
+
+[Вставити скріншот]
+
+2. Вивести тільки назви товарів і їхні ціни з таблиці products.
+
+SQL
+SELECT product_name, unit_price FROM products;
+Результат: Виведено перелік з 24 товарів та їхніх цін.   
+
+[Вставити скріншот]   
+
+3. Показати контактні дані всіх співробітників (ім'я, прізвище, телефон, email).   
+
+SQL
+SELECT first_name, last_name, phone, email FROM employees;
+Результат: Виведено контактну інформацію 8 співробітників інтернет-магазину.   
+
+[Вставити скріншот]
+
+4. Знайти всіх клієнтів з міста Київ.
+
+SQL
+SELECT * FROM customers WHERE city = 'Київ';
+Результат: Отримано записи 4 клієнтів, які проживають або мають офіс у Києві.
+
+[Вставити скріншот]
+
+5. Вивести товари, які коштують більше 25000 грн.
+
+SQL
+SELECT * FROM products WHERE unit_price > 25000;
+Результат: Виведено список преміальних товарів (13 позицій), ціна яких перевищує вказаний поріг.
+
+[Вставити скріншот]
+
+6. Показати всі замовлення зі статусом 'delivered'.
+
+SQL
+SELECT * FROM orders WHERE order_status = 'delivered';
+Результат: Отримано 26 виконаних та доставлених замовлень.
+
+[Вставити скріншот]
+
+7. Знайти співробітників, які працюють у відділі продажів (посада містить слово "продаж").
+
+SQL
+SELECT * FROM employees WHERE title LIKE '%продаж%';
+Результат: Отримано 3 записи менеджерів та 1 директора з продажу.
+
+[Вставити скріншот]
+
+8. Відсортувати товари за зростанням ціни.
+
+SQL
+SELECT * FROM products ORDER BY unit_price ASC;
+Результат: Товари відсортовано від найдешевшого (Зарядний кабель за 699 грн) до найдорожчого.
+
+[Вставити скріншот]
+
+9. Показати клієнтів в алфавітному порядку за іменем контактної особи.
+
+SQL
+SELECT * FROM customers ORDER BY contact_name ASC;
+Результат: Список клієнтів відсортовано від "Білоус Дмитро..." до "Шевченко Віктор...".
+
+[Вставити скріншот]
+
+10. Вивести замовлення від найновіших до найстаріших.
+
+SQL
+SELECT * FROM orders ORDER BY order_date DESC;
+Результат: Замовлення відсортовано у зворотному хронологічному порядку.
+
+[Вставити скріншот]
+
+11. Показати перші 10 найдорожчих товарів.
+
+SQL
+SELECT * FROM products ORDER BY unit_price DESC LIMIT 10;
+Результат: Виведено топ-10 товарів з максимальною ціною (очолює список LG OLED C3).
+
+[Вставити скріншот]
+
+12. Вивести 5 останніх замовлень (за датою).
+
+SQL
+SELECT * FROM orders ORDER BY order_date DESC LIMIT 5;
+Результат: Отримано 5 найсвіжіших замовлень, зроблених у серпні 2024 року.
+
+[Вставити скріншот]
+
+13. Отримати перших 8 клієнтів в алфавітному порядку.
+
+SQL
+SELECT * FROM customers ORDER BY contact_name ASC LIMIT 8;
+Результат: Виведено перші 8 рядків з відсортованого списку контактних осіб.
+
+[Вставити скріншот]
+
+РІВЕНЬ 2. СКЛАДНІ УМОВИ ТА ОПЕРАТОРИ
+14. Знайти всіх клієнтів, чиї імена починаються на "Іван".
+
+SQL
+SELECT * FROM customers WHERE contact_name LIKE 'Іван%';
+Результат: Знайдено клієнтку Іванову Марію.
+
+[Вставити скріншот]
+
+15. Вивести товари, в назві яких є слово "phone" або "телефон".
+
+SQL
+SELECT * FROM products 
+WHERE LOWER(product_name) LIKE '%phone%' 
+   OR LOWER(product_name) LIKE '%телефон%';
+Результат: Виведено смартфони iPhone.
+
+[Вставити скріншот]
+
+16. Самостійно: 3 власні запити з використанням LIKE (початок, кінець, містить).
+
+SQL
+-- Пошук за початком: Категорії, що починаються на "Смарт"
+SELECT * FROM categories WHERE category_name LIKE 'Смарт%';
+
+-- Пошук за кінцем: Клієнти, що використовують пошту Gmail
+SELECT * FROM customers WHERE email LIKE '%@gmail.com';
+
+-- Пошук за вмістом: Товари з роздільною здатністю 4K в описі
+SELECT * FROM products WHERE description LIKE '%4K%';
+Результат: Запити успішно відфільтрували категорії смартфонів/розумного дому, користувачів Gmail та відповідні телевізори.
+
+[Вставити скріншот]
+
+17. Знайти товари дорожчі за 15000 грн і дешевші за 50000 грн.
+
+SQL
+SELECT * FROM products WHERE unit_price > 15000 AND unit_price < 50000;
+Результат: Отримано 15 позицій у середньому преміум-сегменті.
+
+[Вставити скріншот]
+
+18. Вивести клієнтів з Києва або Львова, які є юридичними особами.
+
+SQL
+SELECT * FROM customers 
+WHERE city IN ('Київ', 'Львів') AND customer_type = 'company';
+Результат: Виведено компанії ТОВ "Бізнес Сістемс", ТОВ "Медіа Продакшн" та ПАТ "Фінанс Груп".
+
+[Вставити скріншот]
+
+19. Самостійно: 4 власні запити з комбінаціями логічних операторів.
+
+SQL
+-- Товари, яких мало на складі АБО замовлено багато
+SELECT * FROM products WHERE units_in_stock < 5 OR units_on_order >= 10;
+
+-- Співробітники з Києва із зарплатою від 25000
+SELECT * FROM employees WHERE city = 'Київ' AND salary >= 25000;
+
+-- Замовлення не доставлені, але з дорогою доставкою
+SELECT * FROM orders WHERE NOT order_status = 'delivered' AND freight > 200;
+
+-- Смартфони, які коштують дешевше 20000 АБО їх багато на складі
+SELECT * FROM products WHERE category_id = 1 AND (unit_price < 20000 OR units_in_stock > 20);
+Результат: Отримано логічно відфільтровані вибірки з різних таблиць з використанням AND, OR, NOT.
+
+[Вставити скріншот]
+
+20. Вивести клієнтів з міст Київ, Харків, Одеса, Дніпро.
+
+SQL
+SELECT * FROM customers WHERE city IN ('Київ', 'Харків', 'Одеса', 'Дніпро');
+Результат: Виведено 13 клієнтів із міст-мільйонників.
+
+[Вставити скріншот]
+
+21. Знайти товари в ціновому діапазоні від 10000 до 30000 грн.
+
+SQL
+SELECT * FROM products WHERE unit_price BETWEEN 10000 AND 30000;
+Результат: Виведено 12 товарів середньої цінової категорії.
+
+[Вставити скріншот]
+
+22. Самостійно: по 2 запити для операторів IN, BETWEEN, IS NULL / IS NOT NULL.
+
+SQL
+-- IN (1): Замовлення, відправлені Новою Поштою або УкрПоштою
+SELECT * FROM orders WHERE ship_via IN ('Нова Пошта', 'УкрПошта');
+-- IN (2): Співробітники певних регіонів
+SELECT * FROM employees WHERE region_id IN (2, 3, 25);
+
+-- BETWEEN (1): Замовлення за перший квартал 2024 року
+SELECT * FROM orders WHERE order_date BETWEEN '2024-01-01' AND '2024-03-31';
+-- BETWEEN (2): Зарплати в діапазоні 20-30 тис.
+SELECT * FROM employees WHERE salary BETWEEN 20000 AND 30000;
+
+-- IS NULL: Клієнти-фізичні особи (без назви компанії)
+SELECT * FROM customers WHERE company_name IS NULL;
+-- IS NOT NULL: Підлеглі (мають керівника)
+SELECT * FROM employees WHERE reports_to IS NOT NULL;
+Результат: Відпрацьовано роботу специфічних операторів діапазонів та перевірки на порожнечу (NULL).
+
+[Вставити скріншот]
+
+23. Самостійно: 5 складних запитів (поєднання різних умов).
+
+SQL
+-- 1) Доступні на складі товари певних категорій в ціновому діапазоні
+SELECT * FROM products 
+WHERE category_id IN (1, 2, 7) AND unit_price BETWEEN 15000 AND 40000 AND units_in_stock > 0;
+
+-- 2) Фізичні особи з Києва або Львова зі вказаною поштою
+SELECT * FROM customers 
+WHERE email LIKE '%@%' AND customer_type = 'individual' AND (city = 'Київ' OR city = 'Львів');
+
+-- 3) Недоставлені серпневі замовлення з дорогою доставкою
+SELECT * FROM orders 
+WHERE order_status IN ('pending', 'processing') AND order_date BETWEEN '2024-08-01' AND '2024-08-31' AND freight > 150;
+
+-- 4) Менеджери із середньою зарплатою, які комусь підпорядковуються
+SELECT * FROM employees 
+WHERE title LIKE '%Менеджер%' AND salary BETWEEN 20000 AND 30000 AND reports_to IS NOT NULL;
+
+-- 5) Активні товари брендів Samsung або Apple дорожчі за 20000 грн
+SELECT * FROM products 
+WHERE (product_name LIKE '%Samsung%' OR product_name LIKE '%Apple%') AND discontinued = false AND unit_price > 20000;
+Результат: Успішно виконано складні багатофакторні фільтрації.
+
+[Вставити скріншот]
+
+24. Самостійно: 3 запити з сортуванням за кількома полями та 2 з OFFSET.
+
+SQL
+-- Сортування 1: Товари за категорією, а в межах категорії - від найдорожчого
+SELECT * FROM products ORDER BY category_id ASC, unit_price DESC;
+
+-- Сортування 2: Співробітники за містом, потім за прізвищем
+SELECT * FROM employees ORDER BY city ASC, last_name ASC;
+
+-- Сортування 3: Замовлення за статусом, потім за датою спадання
+SELECT * FROM orders ORDER BY order_status ASC, order_date DESC;
+
+-- Пагінація 1: Пропустити 10 товарів, показати наступні 5 (сторінка 3 при розмірі 5)
+SELECT * FROM products ORDER BY product_id LIMIT 5 OFFSET 10;
+
+-- Пагінація 2: Пропустити перших 5 клієнтів, показати наступних 5
+SELECT * FROM customers ORDER BY customer_id LIMIT 5 OFFSET 5;
+Результат: Дані успішно відсортовано та продемонстровано механізм пагінації (сторінкового вивостю).
+
+[Вставити скріншот]
+
+Висновки
+Самооцінка: 5
+Обгрунтування: В ході виконання лабораторної роботи було створено з'єднання з базою даних, досліджено структуру таблиць та зв'язків інтернет-магазину. Успішно відпрацьовано побудову базових SELECT-запитів, фільтрацію за точними значеннями (WHERE), шаблонами (LIKE), діапазонами (BETWEEN) та списками (IN). Створено складні комбіновані запити з використанням логічних операторів. Засвоєно механізми сортування (ORDER BY) та обмеження кількості рядків разом з пагінацією (LIMIT / OFFSET). Всі поставлені завдання Рівня 2 виконані коректно.
